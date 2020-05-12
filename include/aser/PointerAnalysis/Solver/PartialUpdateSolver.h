@@ -214,10 +214,7 @@ protected:
             // set all copy to be already handled
             copyWorkList.set();  // empty the worklist
             targetList.set();
-
             requiredEdge.reset();
-
-            const size_t prevNodeNum = consGraph.getNodeNum();
 
             int lastID = lsWorkList.find_first_unset();
             while (lastID >= 0) {
@@ -227,29 +224,6 @@ protected:
                     super::processStore(*it, curNode,
                                         [&](CGNodeTy *src, CGNodeTy *dst) { recordCopyEdge(src, dst); });
                 }
-
-//                if (!changedCopy.test(hashEdge(curNode, curNode))) {
-//                    // not changed super node
-//                    typename PT::PtsTy diff;
-//                    auto &wholePts = PT::getPointsTo(curNode->getNodeID());
-//                    diff = wholePts;
-//
-//                    for (auto it = curNode->pred_copy_begin(), ie = curNode->pred_copy_end(); it != ie; it++) {
-//                        CGNodeTy * srcNode = *it;
-//                        auto &pts = PT::getPointsTo(srcNode->getNodeID());
-//                        if (changedCopy.test(hashEdge(srcNode, curNode))) {
-//                            // diff |= pts;
-//                        } else {
-//                            diff.intersectWithComplement(pts);
-//                        }
-//
-//                    }
-//                    if (diff.count() == 0) {
-//                        lastID = lsWorkList.find_next_unset(lastID);
-//                        continue;
-//                    }
-//                    llvm::outs() << diff.count() << ", " << wholePts.count() << "\n";
-//                }
 
                 for (auto it = curNode->succ_load_begin(), ie = curNode->succ_load_end(); it != ie; it++) {
                     super::processLoad(curNode, *it,

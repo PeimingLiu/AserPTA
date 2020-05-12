@@ -261,6 +261,10 @@ protected:
     }
 
 public:
+    virtual ~SolverBase() {
+        CT::release();
+        PT::clearAll();
+    }
 
     // analyze the give module with specified entry function
     bool analyze(llvm::Module *module, llvm::StringRef entry = "main") {

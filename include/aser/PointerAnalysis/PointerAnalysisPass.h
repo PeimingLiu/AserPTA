@@ -26,7 +26,6 @@ public:
             }
         }
         // release previous context
-        Solver::CT::release();
         solver.reset(new Solver());
 
         LOG_INFO("PTA start to run");
