@@ -75,7 +75,6 @@ public:
         PtrNode *ptr = this->getPtrNode(caller->getContext(), allocSite);
 
         this->consGraph->addConstraints(obj, ptr, Constraints::addr_of);
-        PT::insert(ptr->getNodeID(), obj->getNodeID());
     }
 
     // determine whether the function need to be modelled

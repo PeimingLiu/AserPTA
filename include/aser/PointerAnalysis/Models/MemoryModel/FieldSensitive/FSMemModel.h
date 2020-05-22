@@ -6,7 +6,7 @@
 
 #include <glob.h>
 #include <llvm/Support/Allocator.h>
-
+#include "aser/PointerAnalysis/Graph/ConstraintGraph/ConstraintGraph.h"
 #include "aser/PointerAnalysis/Models/MemoryModel/FieldSensitive/FSCanonicalizer.h"
 #include "aser/PointerAnalysis/Models/MemoryModel/FieldSensitive/FSObject.h"
 #include "aser/PointerAnalysis/Models/MemoryModel/FieldSensitive/Layout/MemLayoutManager.h"

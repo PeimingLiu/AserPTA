@@ -42,13 +42,14 @@ private:
 
     public:
         CallBack(Self &solver, size_t nodeNum) : solver(solver), nodeNum(nodeNum) {}
-
+        // FIXME: buggy code! must missed something!
         void onNewConstraint(CGNodeTy *src, CGNodeTy *dst, Constraints constraint) override {
             switch (constraint) {
                 // copy between globals / parameter passing
                 case Constraints::copy: {
                     // new constraint need to be handled
-                    if (src->getNodeID() < nodeNum) {
+                    if (src->getNodeID() < nodeNum /*||
+                        dst->getNodeID() < nodeNum */) {
                         solver.recordCopyEdge(src, dst);
                     }
                     break;
@@ -56,26 +57,29 @@ private:
                 case Constraints::offset: {
                     // offset from globals
                     if (src->getNodeID() < nodeNum) {
-                        solver.processOffset(src, dst, [&](CGNodeTy *fieldObj, CGNodeTy *ptr) {
-                            auto addrNode = llvm::cast<ObjNodeTy>(fieldObj)->getAddrTakenNode();
-                            solver.recordCopyEdge(addrNode, ptr);
-                        });
+                        solver.lsWorkList.reset(src->getNodeID());
+//                        solver.processOffset(src, dst, [&](CGNodeTy *fieldObj, CGNodeTy *ptr) {
+//                            auto addrNode = llvm::cast<ObjNodeTy>(fieldObj)->getAddrTakenNode();
+//                            solver.recordCopyEdge(addrNode, ptr);
+//                        });
                     }
                     break;
                 }
                 case Constraints::load: {
                     // load from global
                     if (src->getNodeID() < nodeNum) {
-                        solver.processLoad(src, dst,
-                                           [&](CGNodeTy *src, CGNodeTy *dst) { solver.recordCopyEdge(src, dst); });
+                        solver.lsWorkList.reset(src->getNodeID());
+//                        solver.processLoad(src, dst,
+//                                           [&](CGNodeTy *src, CGNodeTy *dst) { solver.recordCopyEdge(src, dst); });
                     }
                     break;
                 }
                 case Constraints::store: {
                     // store into global
                     if (dst->getNodeID() < nodeNum) {
-                        solver.processStore(src, dst,
-                                            [&](CGNodeTy *src, CGNodeTy *dst) { solver.recordCopyEdge(src, dst); });
+                        solver.lsWorkList.reset(dst->getNodeID());
+//                        solver.processStore(src, dst,
+//                                            [&](CGNodeTy *src, CGNodeTy *dst) { solver.recordCopyEdge(src, dst); });
                     }
                     break;
                 }
@@ -285,6 +289,9 @@ protected:
             lsWorkList.resize(super::getConsGraph()->getNodeNum(), false);
             targetList.resize(super::getConsGraph()->getNodeNum(), false);
             copyWorkList.resize(super::getConsGraph()->getNodeNum(), false);
+            //lsWorkList.reset();
+            //targetList.reset();
+            //copyWorkList.reset();
 
         } while (reanalyze);
     }

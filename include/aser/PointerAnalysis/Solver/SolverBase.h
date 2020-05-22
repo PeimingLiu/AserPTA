@@ -4,7 +4,6 @@
 #define ASER_PTA_SOLVERBASE_H
 
 #define DEBUG_TYPE "pta"
-
 #include <llvm/IR/Module.h>
 #include <llvm/Pass.h>
 
@@ -77,6 +76,28 @@ protected:
         updatedFunPtrs.clear();
 
         return reanalyze;
+    }
+
+    // seems like the scc becomes the bottleneck, need to merge large scc
+    // return the super node of the scc
+    CGNodeTy *processCopySCC(const std::vector<CGNodeTy *> &scc) {
+        assert(scc.size() > 1);
+
+        CGNodeTy *superNode = scc.front();
+        for (auto nit = ++(scc.begin()), nie = scc.end(); nit != nie; nit++) {
+            // merge pts in scc all into front
+            this->processCopy(*nit, superNode);
+        }
+
+        // collapse scc to the front node
+        this->getConsGraph()->collapseSCCTo(scc, superNode);
+
+        // if there is a function ptr in the scc, update the function ptr
+        if (superNode->isFunctionPtr()) {
+            this->updateFunPtr(superNode->getNodeID());
+        }
+
+        return superNode;
     }
 
     // some helper function that might be needed by subclasses
@@ -207,6 +228,7 @@ protected:
             // resolve indirect calls in language model
             reanalyze = resolveFunPtrs();
         } while (reanalyze);
+        // llvm::outs() << this->getConsGraph()->getNodeNum();
     }
 
     [[nodiscard]]
@@ -216,7 +238,11 @@ protected:
 
     void dumpPointsTo() {
         std::error_code ErrInfo;
-        llvm::ToolOutputFile F("PTS.txt", ErrInfo, llvm::sys::fs::F_None);
+        std::string fileName;
+        llvm::raw_string_ostream os(fileName);
+        os << "PTS" << this;
+
+        llvm::ToolOutputFile F(os.str(), ErrInfo, llvm::sys::fs::F_None);
         if (!ErrInfo) {
             // dump the points to set
 
@@ -280,8 +306,12 @@ public:
 
         consGraph = LMT::getConsGraph(langModel.get());
 
+        std::string fileName;
+        llvm::raw_string_ostream os(fileName);
+        os << this;
+
         if (ConfigPrintConstraintGraph) {
-            WriteGraphToFile("ConstraintGraph_Initial", *this->getConsGraph());
+            WriteGraphToFile("ConstraintGraph_Initial_" + os.str(), *this->getConsGraph());
         }
 
         // subclass might override solve() directly for more aggressive overriding
@@ -293,10 +323,10 @@ public:
                   this->getCallGraph()->getNodeNum());
 
         if (ConfigPrintConstraintGraph) {
-            WriteGraphToFile("ConstraintGraph_Final", *this->getConsGraph());
+            WriteGraphToFile("ConstraintGraph_Final_" + os.str(), *this->getConsGraph());
         }
         if (ConfigPrintCallGraph) {
-            WriteGraphToFile("CallGraph_Final", *this->getCallGraph());
+            WriteGraphToFile("CallGraph_Final_" + os.str(), *this->getCallGraph());
         }
         if (ConfigDumpPointsToSet) {
             // dump the points to set of every pointers

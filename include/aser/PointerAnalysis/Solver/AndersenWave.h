@@ -29,40 +29,59 @@ protected:
         do {
             changed = false;
 
+            std::stack<std::vector<CGNodeTy *>> copySCCStack;
             // first do SCC detection and topo-sort
-            auto copy_it = scc_begin<ctx, Constraints::copy>(consGraph);
-            auto copy_ie = scc_end<ctx, Constraints::copy>(consGraph);
+            auto copy_it = scc_begin<ctx, Constraints::copy, false>(consGraph);
+            auto copy_ie = scc_end<ctx, Constraints::copy, false>(consGraph);
 
             for (; copy_it != copy_ie; ++copy_it) {
-                const std::vector<CGNodeTy *> &scc = *copy_it;
-                if (copy_it.hasLoop()) {
-                    // We do not merge SCC in this solver,
-                    // As the current implementation is much more clear, and it works fine.
-
-                    // instead of collapsing SCC into super nodes,
-                    // simply propagate points to set within the SCC the node.
-                    // within the same scc, all nodes should have exactly the same pts
-                    for (auto nit = ++(scc.begin()), nie = scc.end(); nit != nie; nit++) {
-                        super::processCopy(*nit, scc.front());
-                    }
-                    // now scc.front get all pts in the pts
-                    for (auto nit = ++(scc.begin()), nie = scc.end(); nit != nie; nit++) {
-                        // propagate pts back from the front node to nodes in
-                        // the SCC.
-                        CGNodeTy *node = *nit;
-                        super::processCopy(scc.front(), node);
-
-                        for (auto cit = node->succ_copy_begin(), cie = node->succ_copy_end(); cit != cie; cit++) {
-                            super::processCopy(node, *cit);
-                        }
-                    }
-                }
-                // now handle the node at the front
-                CGNodeTy *curNode = scc.front();
-                for (auto cit = curNode->succ_copy_begin(), cie = curNode->succ_copy_end(); cit != cie; cit++) {
-                    super::processCopy(curNode, *cit);
-                }
+                copySCCStack.push(*copy_it);
             }
+
+            while (!copySCCStack.empty()) {
+                const std::vector<CGNodeTy *> &scc = copySCCStack.top();
+                if (scc.size() > 1) {
+                    super::processCopySCC(scc);
+                } else {
+                    CGNodeTy *curNode = scc.front();
+                    for (auto cit = curNode->succ_copy_begin(), cie = curNode->succ_copy_end(); cit != cie; cit++) {
+                        super::processCopy(curNode, *cit);
+                    }
+                }
+                copySCCStack.pop();
+            }
+
+
+//            for (; copy_it != copy_ie; ++copy_it) {
+//                const std::vector<CGNodeTy *> &scc = *copy_it;
+//                if (copy_it.hasLoop()) {
+//                    // We do not merge SCC in this solver,
+//                    // As the current implementation is much more clear, and it works fine.
+//
+//                    // instead of collapsing SCC into super nodes,
+//                    // simply propagate points to set within the SCC the node.
+//                    // within the same scc, all nodes should have exactly the same pts
+//                    for (auto nit = ++(scc.begin()), nie = scc.end(); nit != nie; nit++) {
+//                        super::processCopy(*nit, scc.front());
+//                    }
+//                    // now scc.front get all pts in the pts
+//                    for (auto nit = ++(scc.begin()), nie = scc.end(); nit != nie; nit++) {
+//                        // propagate pts back from the front node to nodes in
+//                        // the SCC.
+//                        CGNodeTy *node = *nit;
+//                        super::processCopy(scc.front(), node);
+//
+//                        for (auto cit = node->succ_copy_begin(), cie = node->succ_copy_end(); cit != cie; cit++) {
+//                            super::processCopy(node, *cit);
+//                        }
+//                    }
+//                }
+//                // now handle the node at the front
+//                CGNodeTy *curNode = scc.front();
+//                for (auto cit = curNode->succ_copy_begin(), cie = curNode->succ_copy_end(); cit != cie; cit++) {
+//                    super::processCopy(curNode, *cit);
+//                }
+//            }
 
             // then handle STORE/LOAD edges.
             size_t nodeNum = consGraph.getNodeNum();

@@ -306,7 +306,7 @@ protected:
         }
         if (changed) {
             size_t afterResolve = this->getConsGraph()->getNodeNum();
-            LOG_DEBUG("PTA Node Stat: Before={}, After={}, New={}", beforeResolve, afterResolve,
+            LOG_INFO("PTA Node Stat: Before={}, After={}, New={}", beforeResolve, afterResolve,
                       afterResolve - beforeResolve);
         }
         return changed;

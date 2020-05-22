@@ -69,7 +69,7 @@ public:
                 os << "anonymous ptr";
             } else if (ptr->getValue()->hasName()) {
                 os << CtxTrait<ctx>::toString(getContext(), true) << "\n";
-                os << ptr->getValue()->getName();
+                os << *ptr->getValue() << "\n"; //->getName();
             } else {
                 os << CtxTrait<ctx>::toString(getContext(), true) << "\n";
                 os << *ptr->getValue() << "\n";
