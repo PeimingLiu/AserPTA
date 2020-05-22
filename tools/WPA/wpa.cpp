@@ -12,11 +12,12 @@
 #include "aser/PointerAnalysis/Context/KCallSite.h"
 #include "aser/PointerAnalysis/Context/KOrigin.h"
 #include "aser/PointerAnalysis/Context/NoCtx.h"
-#include "aser/PointerAnalysis/Models/LanguageModel/DefaultLangModel/DefaultLangModel.h"
 #include "aser/PointerAnalysis/Models/MemoryModel/FieldSensitive/FSMemModel.h"
+#include "aser/PointerAnalysis/Models/LanguageModel/DefaultLangModel/DefaultLangModel.h"
 #include "aser/PointerAnalysis/PTAVerificationPass.h"
 #include "aser/PointerAnalysis/PointerAnalysisPass.h"
 #include "aser/PointerAnalysis/Solver/PartialUpdateSolver.h"
+#include "aser/PointerAnalysis/Solver/AndersenWave.h"
 
 #include "aser/PreProcessing/IRPreProcessor.h"
 #include "aser/PreProcessing/Passes/InsertGlobalCtorCallPass.h"
@@ -31,9 +32,11 @@ static cl::opt<std::string> TargetModulePath(cl::Positional, cl::desc("path to i
 
 using Model = DefaultLangModel<NoCtx, FSMemModel<NoCtx>>;
 using PTASolver = PartialUpdateSolver<Model>;
+using WaveSolver = AndersenWave<Model>;
 
 namespace {
 
+template<typename PTASolver>
 class PTADriverPass : public ModulePass {
 public:
     static char ID;
@@ -44,18 +47,27 @@ public:
     }
 
     bool runOnModule(Module &M) override {
+        llvm::ResetStatistics();
         getAnalysis<PointerAnalysisPass<PTASolver>>().analyze(&M);
         llvm::PrintStatistics(llvm::outs());
-
+        llvm::ResetStatistics();
+        getAnalysis<PointerAnalysisPass<PTASolver>>().release();
         return false;
     }
 };
 
-char PTADriverPass::ID;
-static llvm::RegisterPass<PTADriverPass>
-    PTAD("PTA Driver Pass",
+template<typename PTASolver>
+char PTADriverPass<PTASolver>::ID;
+
+static llvm::RegisterPass<PTADriverPass<PTASolver>>
+    PTAD("pta-partial",
          "PTA Driver Pass",
-        true, true);
+         true, true);
+
+static llvm::RegisterPass<PTADriverPass<WaveSolver>>
+    PTADW("pta-wave",
+         "PTA Driver Pass",
+         true, true);
 
 }
 
@@ -99,7 +111,11 @@ int main(int argc, char** argv) {
     passes.add(new StandardHeapAPIRewritePass);
 
     passes.add(new PointerAnalysisPass<PTASolver>());
-    passes.add(new PTADriverPass);
+    passes.add(new PTADriverPass<PTASolver>);
+
+    passes.add(new PointerAnalysisPass<WaveSolver>());
+    passes.add(new PTADriverPass<WaveSolver>);
+
     passes.run(*module);
 
     // Dump IR to file
@@ -119,5 +135,10 @@ int main(int argc, char** argv) {
 
 static llvm::RegisterPass<PointerAnalysisPass<PTASolver>>
     PAP("Pointer Analysis Wrapper Pass",
+        "Pointer Analysis Wrapper Pass",
+        true, true);
+
+static llvm::RegisterPass<PointerAnalysisPass<WaveSolver>>
+    WS("Pointer Analysis Wave Solver Pass",
         "Pointer Analysis Wrapper Pass",
         true, true);
