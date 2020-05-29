@@ -78,6 +78,7 @@ public:
     }
 
     static void release() {
+        llvm::outs() << "number of origin " << ctxSet.size() << "\n";
         ctxSet.clear();
     }
 };

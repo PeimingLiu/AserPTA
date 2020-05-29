@@ -53,8 +53,6 @@ public:
     }
 
     inline bool addConstraints(CGNodeTy *src, CGNodeTy *dst, Constraints constraint) {
-        NumConstraints++;
-
         // should not add edges to nodes that has super node
         assert(src && dst /*&& !src->hasSuperNode() && !dst->hasSuperNode()*/);
         // self-circle copy edges has no effect
@@ -81,12 +79,15 @@ public:
                 if (callBack) {
                     callBack->onNewConstraint(anonNode, dst, Constraints::copy);
                 }
+
+                NumConstraints++;
                 return true;
             }
             return false;
         } else {
             bool newEdge = src->insertConstraint(dst, constraint);
-            if (callBack) {
+            if (callBack && newEdge) {
+                NumConstraints++;
                 callBack->onNewConstraint(src, dst, constraint);
             }
             return newEdge;

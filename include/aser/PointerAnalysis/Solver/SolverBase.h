@@ -97,6 +97,10 @@ protected:
             this->updateFunPtr(superNode->getNodeID());
         }
 
+        for (auto cit = superNode->succ_copy_begin(), cie = superNode->succ_copy_end(); cit != cie; cit++) {
+            this->processCopy(superNode, *cit);
+        }
+
         return superNode;
     }
 
@@ -174,12 +178,16 @@ protected:
     // for every node in pts(src):
     //     node --COPY--> dst
     template <typename CallBack = Noop>
-    bool processLoad(CGNodeTy *src, CGNodeTy *dst, CallBack callBack = Noop{}) {
+    bool processLoad(CGNodeTy *src, CGNodeTy *dst,
+                     CallBack callBack = Noop{}, const typename PT::PtsTy *diffPts = nullptr) {
         assert(!src->hasSuperNode() && !dst->hasSuperNode());
         ProcessedLoad ++;
+        if (diffPts == nullptr) {
+            diffPts = &PT::getPointsTo(src->getNodeID());
+        }
 
         bool changed = false;
-        for (auto it = PT::begin(src->getNodeID()), ie = PT::end(src->getNodeID()); it != ie; it++) {
+        for (auto it = diffPts->begin(), ie = diffPts->end(); it != ie; it++) {
             auto node = (*consGraph)[*it];
             node = node->getSuperNode();
             if (consGraph->addConstraints(node, dst, Constraints::copy)) {
@@ -199,12 +207,16 @@ protected:
     // for every node in pts(dst):
     //      src --COPY--> node
     template <typename CallBack = Noop>
-    bool processStore(CGNodeTy *src, CGNodeTy *dst, CallBack callBack = Noop{}) {
+    bool processStore(CGNodeTy *src, CGNodeTy *dst,
+                      CallBack callBack = Noop{}, const typename PT::PtsTy *diffPts = nullptr) {
         assert(!src->hasSuperNode() && !dst->hasSuperNode());
+        if (diffPts == nullptr) {
+            diffPts = &PT::getPointsTo(dst->getNodeID());
+        }
 
         ProcessedStore ++;
         bool changed = false;
-        for (auto it = PT::begin(dst->getNodeID()), ie = PT::end(dst->getNodeID()); it != ie; it++) {
+        for (auto it = diffPts->begin(), ie = diffPts->end(); it != ie; it++) {
             auto node = (*consGraph)[*it];
             node = node->getSuperNode();
 

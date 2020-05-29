@@ -12,13 +12,12 @@
 #include "aser/PointerAnalysis/Context/KCallSite.h"
 #include "aser/PointerAnalysis/Context/KOrigin.h"
 #include "aser/PointerAnalysis/Context/NoCtx.h"
-#include "aser/PointerAnalysis/Models/MemoryModel/FieldSensitive/FSMemModel.h"
 #include "aser/PointerAnalysis/Models/LanguageModel/DefaultLangModel/DefaultLangModel.h"
+#include "aser/PointerAnalysis/Models/MemoryModel/FieldSensitive/FSMemModel.h"
 #include "aser/PointerAnalysis/PTAVerificationPass.h"
 #include "aser/PointerAnalysis/PointerAnalysisPass.h"
 #include "aser/PointerAnalysis/Solver/PartialUpdateSolver.h"
-#include "aser/PointerAnalysis/Solver/AndersenWave.h"
-
+#include "aser/PointerAnalysis/Solver/WavePropagation.h"
 #include "aser/PreProcessing/IRPreProcessor.h"
 #include "aser/PreProcessing/Passes/InsertGlobalCtorCallPass.h"
 #include "aser/PreProcessing/Passes/RemoveASMInstPass.h"
@@ -30,9 +29,15 @@ using namespace std;
 
 static cl::opt<std::string> TargetModulePath(cl::Positional, cl::desc("path to input bitcode file"));
 
-using Model = DefaultLangModel<NoCtx, FSMemModel<NoCtx>>;
-using PTASolver = PartialUpdateSolver<Model>;
-using WaveSolver = AndersenWave<Model>;
+using Origin = KOrigin<1>;
+
+template <typename ctx>
+using Model = DefaultLangModel<ctx, FSMemModel<ctx>>;
+
+//using OriginSolver = PartialUpdateSolver<Model<Origin>>;
+using WaveSolver = WavePropagation<Model<NoCtx>>;
+using NoCtxSolver = PartialUpdateSolver<Model<NoCtx>>;
+//using CallsiteSolver = PartialUpdateSolver<Model<KCallSite<2>>>;
 
 namespace {
 
@@ -59,15 +64,25 @@ public:
 template<typename PTASolver>
 char PTADriverPass<PTASolver>::ID;
 
-static llvm::RegisterPass<PTADriverPass<PTASolver>>
-    PTAD("pta-partial",
-         "PTA Driver Pass",
-         true, true);
+//static llvm::RegisterPass<PTADriverPass<OriginSolver>>
+//    PTAD("pta-partial",
+//         "PTA Driver Pass",
+//         true, true);
+//
+//static llvm::RegisterPass<PTADriverPass<CallsiteSolver>>
+//    PTADW("pta-wave",
+//          "PTA Driver Pass",
+//          true, true);
+
+static llvm::RegisterPass<PTADriverPass<NoCtxSolver>>
+    PTACS("pta-no",
+          "PTA Driver Pass",
+          true, true);
 
 static llvm::RegisterPass<PTADriverPass<WaveSolver>>
-    PTADW("pta-wave",
-         "PTA Driver Pass",
-         true, true);
+    WS("pta-wave",
+       "PTA Driver Pass",
+       true, true);
 
 }
 
@@ -100,6 +115,15 @@ int main(int argc, char** argv) {
 
     LOG_INFO("Preprocessing IR");
 
+    Origin::setOriginRules([](const Origin *, const llvm::Instruction *I) -> bool {
+      if (auto call = llvm::dyn_cast<CallBase>(I)) {
+          if (call->getCalledFunction()) {
+              return call->getCalledFunction()->getName().equals("pthread_create");
+          }
+      }
+      return false;
+    });
+
     // Preprocessing the IR
     IRPreProcessor preProcessor;
     preProcessor.runOnModule(*module);
@@ -110,11 +134,18 @@ int main(int argc, char** argv) {
     passes.add(new RemoveASMInstPass());
     passes.add(new StandardHeapAPIRewritePass);
 
-    passes.add(new PointerAnalysisPass<PTASolver>());
-    passes.add(new PTADriverPass<PTASolver>);
+    passes.add(new PointerAnalysisPass<NoCtxSolver>());
+    passes.add(new PTADriverPass<NoCtxSolver>);
 
     passes.add(new PointerAnalysisPass<WaveSolver>());
     passes.add(new PTADriverPass<WaveSolver>);
+
+
+//    passes.add(new PointerAnalysisPass<OriginSolver>());
+//    passes.add(new PTADriverPass<OriginSolver>);
+//
+//    passes.add(new PointerAnalysisPass<CallsiteSolver>());
+//    passes.add(new PTADriverPass<CallsiteSolver>);
 
     passes.run(*module);
 
@@ -133,12 +164,23 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-static llvm::RegisterPass<PointerAnalysisPass<PTASolver>>
-    PAP("Pointer Analysis Wrapper Pass",
+static llvm::RegisterPass<PointerAnalysisPass<NoCtxSolver>>
+    PAP("Pointer Analysis no Wrapper Pass",
         "Pointer Analysis Wrapper Pass",
         true, true);
 
+
 static llvm::RegisterPass<PointerAnalysisPass<WaveSolver>>
-    WS("Pointer Analysis Wave Solver Pass",
+    WAP("Pointer Analysis andersen wave Wrapper Pass",
         "Pointer Analysis Wrapper Pass",
         true, true);
+
+//static llvm::RegisterPass<PointerAnalysisPass<CallsiteSolver>>
+//    WS("Pointer Analysis call Wave Solver Pass",
+//       "Pointer Analysis Wrapper Pass",
+//       true, true);
+
+//static llvm::RegisterPass<PointerAnalysisPass<OriginSolver>>
+//    CS("Pointer Analysis origin Wave Solver Pass",
+//       "Pointer Analysis Wrapper Pass",
+//       true, true);

@@ -9,8 +9,8 @@
 #include "SolverBase.h"
 #include "aser/PointerAnalysis/Graph/ConstraintGraph/SCCIterator.h"
 
-//#define HASH_EDGE_LIMIT 6700417 // a large enough prime number
-#define HASH_EDGE_LIMIT 1000032953
+#define HASH_EDGE_LIMIT 6700417 // a large enough prime number
+//#define HASH_EDGE_LIMIT  1000032953
 
 namespace aser {
 // just experimental feature for now.
