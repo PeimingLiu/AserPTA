@@ -185,7 +185,7 @@ static llvm::RegisterPass<PointerAnalysisPass<WaveSolver>>
         "Pointer Analysis Wrapper Pass",
         true, true);
 
-static llvm::RegisterPass<PointerAnalysisPass<WaveSolver>>
+static llvm::RegisterPass<PointerAnalysisPass<DPSolver>>
     DPP("Pointer Analysis deep propagation Wrapper Pass",
         "Pointer Analysis Wrapper Pass",
         true, true);
