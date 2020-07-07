@@ -330,7 +330,7 @@ private:
     template <typename PT>
     inline void processScalarGlobals(MemBlock<ctx> *memBlock, const llvm::Constant *C, size_t &offset,
                                      const llvm::DataLayout &DL) {
-        if (C->getType()->isPointerTy()) {
+        if (C->getType()->isPointerTy() && !llvm::isa<llvm::BlockAddress>(C)) {
             /* FIXME: what if the constexpr is a complicated expression or global alias?
                need to evaluate it statically. */
             // now assume it point is a global variable

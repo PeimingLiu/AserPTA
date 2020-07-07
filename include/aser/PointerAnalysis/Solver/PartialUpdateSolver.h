@@ -9,8 +9,10 @@
 #include "SolverBase.h"
 #include "aser/PointerAnalysis/Graph/ConstraintGraph/SCCIterator.h"
 
+extern llvm::cl::opt<bool> CollectStats;
+
 #define HASH_EDGE_LIMIT 6700417 // a large enough prime number
-//#define HASH_EDGE_LIMIT  1000032953
+//#define HASH_EDGE_LIMIT 1000032953
 
 namespace aser {
 // just experimental feature for now.
@@ -42,14 +44,13 @@ private:
 
     public:
         CallBack(Self &solver, size_t nodeNum) : solver(solver), nodeNum(nodeNum) {}
-        // FIXME: buggy code! must missed something!
+
         void onNewConstraint(CGNodeTy *src, CGNodeTy *dst, Constraints constraint) override {
             switch (constraint) {
                 // copy between globals / parameter passing
                 case Constraints::copy: {
                     // new constraint need to be handled
-                    if (src->getNodeID() < nodeNum /*||
-                        dst->getNodeID() < nodeNum */) {
+                    if (src->getNodeID() < nodeNum) {
                         solver.recordCopyEdge(src, dst);
                     }
                     break;
@@ -57,29 +58,26 @@ private:
                 case Constraints::offset: {
                     // offset from globals
                     if (src->getNodeID() < nodeNum) {
-                        solver.lsWorkList.reset(src->getNodeID());
-//                        solver.processOffset(src, dst, [&](CGNodeTy *fieldObj, CGNodeTy *ptr) {
-//                            auto addrNode = llvm::cast<ObjNodeTy>(fieldObj)->getAddrTakenNode();
-//                            solver.recordCopyEdge(addrNode, ptr);
-//                        });
+                        solver.processOffset(src, dst, [&](CGNodeTy *fieldObj, CGNodeTy *ptr) {
+                          auto addrNode = llvm::cast<ObjNodeTy>(fieldObj)->getAddrTakenNode();
+                          solver.recordCopyEdge(addrNode, ptr);
+                        });
                     }
                     break;
                 }
                 case Constraints::load: {
                     // load from global
                     if (src->getNodeID() < nodeNum) {
-                        solver.lsWorkList.reset(src->getNodeID());
-//                        solver.processLoad(src, dst,
-//                                           [&](CGNodeTy *src, CGNodeTy *dst) { solver.recordCopyEdge(src, dst); });
+                        solver.processLoad(src, dst,
+                                           [&](CGNodeTy *src, CGNodeTy *dst) { solver.recordCopyEdge(src, dst); });
                     }
                     break;
                 }
                 case Constraints::store: {
                     // store into global
                     if (dst->getNodeID() < nodeNum) {
-                        solver.lsWorkList.reset(dst->getNodeID());
-//                        solver.processStore(src, dst,
-//                                            [&](CGNodeTy *src, CGNodeTy *dst) { solver.recordCopyEdge(src, dst); });
+                        solver.processStore(src, dst,
+                                            [&](CGNodeTy *src, CGNodeTy *dst) { solver.recordCopyEdge(src, dst); });
                     }
                     break;
                 }
@@ -116,6 +114,8 @@ private:
 
             // merge pts in scc all into front
             super::processCopy(*nit, superNode);
+            // clear the points-to set after it is merged into the super node
+            PT::clear((*nit)->getNodeID());
         }
 
         lsWorkList.reset(superNode->getNodeID());
@@ -182,6 +182,9 @@ protected:
         ConsGraphTy &consGraph = *(super::getConsGraph());
 
         do {
+            size_t processedNode = 0;
+            size_t processedEdge = 0;
+
             std::stack<std::vector<CGNodeTy *>> copySCCStack;
 
             // first do SCC detection and topo-sort
@@ -199,27 +202,41 @@ protected:
 
                 if (scc.size() > 1) {
                     processCopySCC(scc);
+                    processedNode ++;
+                    processedEdge ++;
                 } else {
                     CGNodeTy *curNode = scc.front();
+                    bool processed = false;
                     for (auto cit = curNode->succ_copy_begin(), cie = curNode->succ_copy_end(); cit != cie; cit++) {
                         if (shouldProcessCopy(curNode, *cit)) {
+                            processed = true;
+                            processedEdge ++;
+
                             if (super::processCopy(curNode, *cit)) {
                                 // changedCopy.set(hashEdge(curNode, *cit));
                                 lsWorkList.reset((*cit)->getNodeID());
                             }
                         }
                     }
+                    if (processed) {
+                        processedNode ++;
+                    }
                 }
                 copySCCStack.pop();
             }
 
+            if (CollectStats) {
+                LOG_INFO("Partial Update Solver: N:{}, E:{}, TN:{}", processedNode, processedEdge, consGraph.getNodeNum());
+            }
             assert(copySCCStack.size() == 0);
 
             // set all copy to be already handled
             copyWorkList.set();  // empty the worklist
             targetList.set();
+
             requiredEdge.reset();
 
+            const size_t prevNodeNum = consGraph.getNodeNum();
             int lastID = lsWorkList.find_first_unset();
             while (lastID >= 0) {
                 CGNodeTy *curNode = consGraph.getNode(lastID);
@@ -233,27 +250,51 @@ protected:
                     super::processLoad(curNode, *it,
                                        [&](CGNodeTy *src, CGNodeTy *dst) { recordCopyEdge(src, dst); });
                 }
-
+#ifndef NO_ADDR_OF_FOR_OFFSET
                 for (auto it = curNode->succ_offset_begin(), ie = curNode->succ_offset_end(); it != ie; it++) {
                     super::processOffset(curNode, *it, [&](CGNodeTy *fieldObj, CGNodeTy *ptr) {
                       auto addrNode = llvm::cast<ObjNodeTy>(fieldObj)->getAddrTakenNode();
                       recordCopyEdge(addrNode, ptr);
                     });
                 }
-
+#endif
                 lastID = lsWorkList.find_next_unset(lastID);
             }
 
+#ifndef NO_ADDR_OF_FOR_OFFSET
             // index field can create new object thus make the constraint graph larger.
             lsWorkList.resize(consGraph.getNodeNum(), true);
             lsWorkList.set();  // mark all lsWorkList as done
+#else
+            assert(prevNodeNum == consGraph.getNodeNum());
+            llvm::BitVector tmpWorklist(lsWorkList);
+            lsWorkList.set(); // copy and clear lsWorkList
 
-            // changedCopy.reset();
+            lastID = tmpWorklist.find_first_unset();
+
+            while (lastID >= 0) {
+                CGNodeTy *curNode = consGraph.getNode(lastID);
+
+                for (auto it = curNode->succ_offset_begin(), ie = curNode->succ_offset_end(); it != ie; it++) {
+                    super::processOffset(curNode, *it, [&](CGNodeTy *fieldObj, CGNodeTy *ptr) {
+                      assert(ptr->getNodeID() < targetList.size());
+                      //targetList.reset(ptr->getNodeID());
+                      PT::insert(ptr->getNodeID(), llvm::cast<ObjNodeTy>(fieldObj)->getObjectID());
+
+                      // ensure that ptr is visited by SCCIterator
+                      copyWorkList.reset(ptr->getNodeID());
+                      // the pts of ptr has been updated, so need to be revisted by load/store
+                      lsWorkList.reset(ptr->getNodeID());
+                    });
+                }
+                lastID = tmpWorklist.find_next_unset(lastID);
+            }
+#endif
+            lsWorkList.resize(consGraph.getNodeNum(), true);
             // the newly added node contains address taken node, which need to be revisited again
             // so set the extend bit to 0 (unhandled)
             copyWorkList.resize(consGraph.getNodeNum(), false);
             targetList.resize(consGraph.getNodeNum(), true);
-            //llvm::outs() << "..";
         } while (!copyWorkList.all());
     }
 
@@ -289,9 +330,6 @@ protected:
             lsWorkList.resize(super::getConsGraph()->getNodeNum(), false);
             targetList.resize(super::getConsGraph()->getNodeNum(), false);
             copyWorkList.resize(super::getConsGraph()->getNodeNum(), false);
-            //lsWorkList.reset();
-            //targetList.reset();
-            //copyWorkList.reset();
 
         } while (reanalyze);
     }

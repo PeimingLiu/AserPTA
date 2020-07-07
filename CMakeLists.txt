@@ -34,7 +34,7 @@ if(NOT COMMAND add_llvm_loadable_module)
         if(CMAKE_BUILD_TYPE MATCHES "Debug")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O0 ${COMMON_CXX_FLAG}")
         else()
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -static -O3 ${COMMON_CXX_FLAG}")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 ${COMMON_CXX_FLAG}")
         endif()
 
         find_package(LLVM 9.0.0 REQUIRED CONFIG NO_DEFAULT_PATH)
@@ -66,10 +66,10 @@ add_subdirectory(lib)
 add_subdirectory(tools)
 
 # unit tests
-if (${ENABLE_TEST})
+#if (${ENABLE_TEST})
     enable_testing()
 
     add_subdirectory(utils/googletest)
-    add_subdirectory(unittests)
-endif()
+    add_subdirectory(unittests/PointerAnalysis)
+#endif()
 

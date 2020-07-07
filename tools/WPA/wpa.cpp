@@ -18,6 +18,7 @@
 #include "aser/PointerAnalysis/PointerAnalysisPass.h"
 #include "aser/PointerAnalysis/Solver/PartialUpdateSolver.h"
 #include "aser/PointerAnalysis/Solver/WavePropagation.h"
+#include "aser/PointerAnalysis/Solver/DeepPropagation.h"
 #include "aser/PreProcessing/IRPreProcessor.h"
 #include "aser/PreProcessing/Passes/InsertGlobalCtorCallPass.h"
 #include "aser/PreProcessing/Passes/RemoveASMInstPass.h"
@@ -32,10 +33,11 @@ static cl::opt<std::string> TargetModulePath(cl::Positional, cl::desc("path to i
 using Origin = KOrigin<1>;
 
 template <typename ctx>
-using Model = DefaultLangModel<ctx, FSMemModel<ctx>>;
+using Model = DefaultLangModel<ctx, FIMemModel<ctx>>;
 
 //using OriginSolver = PartialUpdateSolver<Model<Origin>>;
 using WaveSolver = WavePropagation<Model<NoCtx>>;
+using DPSolver = DeepPropagation<Model<NoCtx>>;
 using NoCtxSolver = PartialUpdateSolver<Model<NoCtx>>;
 //using CallsiteSolver = PartialUpdateSolver<Model<KCallSite<2>>>;
 
@@ -84,6 +86,11 @@ static llvm::RegisterPass<PTADriverPass<WaveSolver>>
        "PTA Driver Pass",
        true, true);
 
+static llvm::RegisterPass<PTADriverPass<DPSolver>>
+    DPS("pta-dp",
+       "PTA Driver Pass",
+       true, true);
+
 }
 
 int main(int argc, char** argv) {
@@ -125,8 +132,8 @@ int main(int argc, char** argv) {
     });
 
     // Preprocessing the IR
-    IRPreProcessor preProcessor;
-    preProcessor.runOnModule(*module);
+    //IRPreProcessor preProcessor;
+    //preProcessor.runOnModule(*module);
 
     passes.add(new CanonicalizeGEPPass());
     passes.add(new LoweringMemCpyPass());
@@ -139,6 +146,9 @@ int main(int argc, char** argv) {
 
     passes.add(new PointerAnalysisPass<WaveSolver>());
     passes.add(new PTADriverPass<WaveSolver>);
+
+    passes.add(new PointerAnalysisPass<DPSolver>());
+    passes.add(new PTADriverPass<DPSolver>);
 
 
 //    passes.add(new PointerAnalysisPass<OriginSolver>());
@@ -172,6 +182,11 @@ static llvm::RegisterPass<PointerAnalysisPass<NoCtxSolver>>
 
 static llvm::RegisterPass<PointerAnalysisPass<WaveSolver>>
     WAP("Pointer Analysis andersen wave Wrapper Pass",
+        "Pointer Analysis Wrapper Pass",
+        true, true);
+
+static llvm::RegisterPass<PointerAnalysisPass<DPSolver>>
+    DPP("Pointer Analysis deep propagation Wrapper Pass",
         "Pointer Analysis Wrapper Pass",
         true, true);
 

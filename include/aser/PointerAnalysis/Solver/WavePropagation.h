@@ -89,7 +89,7 @@ protected:
                 }
 
                 for (auto it = curNode->pred_store_begin(), ie = curNode->pred_store_end(); it != ie; it++) {
-                    auto &cachedPts = edgeCachedPTS[std::make_tuple(curNode, *it, Constraints::load)];
+                    auto &cachedPts = edgeCachedPTS[std::make_tuple(curNode, *it, Constraints::store)];
                     typename PT::PtsTy diffPTS;
                     diffPTS.intersectWithComplement(PT::getPointsTo(curNode->getNodeID()),
                                                     cachedPts);

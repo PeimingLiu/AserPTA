@@ -5,6 +5,10 @@
 #include "aser/PointerAnalysis/Solver/PointsTo/BitVectorPTS.h"
 #include "aser/PointerAnalysis/Solver/PointsTo/PointedByPts.h"
 
+using namespace llvm;
+
+cl::opt<bool> CollectStats("collect-stats", cl::desc("Dump the modified ir file"));
+
 namespace aser {
 
 std::vector<BitVectorPTS::PtsTy> BitVectorPTS::ptsVec;
