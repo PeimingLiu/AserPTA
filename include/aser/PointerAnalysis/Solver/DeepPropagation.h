@@ -73,8 +73,8 @@ protected:
 
         // Step 3: deep propagation
         do {
+            size_t beforeResolve = this->getConsGraph()->getNodeNum();
             changed = false;
-            LOG_INFO("Deep Propagation Solving");
             size_t nodeNum = consGraph.getNodeNum();
             for (NodeID id = 0; id < nodeNum; id++) {
                 CGNodeTy *curNode = consGraph.getNode(id);
@@ -97,26 +97,27 @@ protected:
                     }
 
                     typename PT::PtsTy diffPTS;
-                    diffPTS.intersectWithComplement(PT::getPointsTo((*it)->getNodeID()), newPTS);
+                    diffPTS.intersectWithComplement(newPTS, PT::getPointsTo((*it)->getNodeID()));
                     deepPropagate(*it, *it, diffPTS, changed);
                     unmarkBlack();
                 }
 
                 // for all store constraints
                 // curNode <--store-- *it
+                //    l    <--store--  r
                 for (auto it = curNode->pred_store_begin(), ie = curNode->pred_store_end(); it != ie; it++) {
-                    auto &cachedPts = edgeCachedPTS[std::make_tuple(curNode, *it, Constraints::store)];
+                    auto &cachedPts = edgeCachedPTS[std::make_tuple(*it, curNode, Constraints::store)];
                     typename PT::PtsTy newEdgePTS;
                     newEdgePTS.intersectWithComplement(PT::getPointsTo(curNode->getNodeID()),
                                                     cachedPts);
                     cachedPts |= newEdgePTS;
 
                     for (auto v : newEdgePTS) {
-                        // FIXME: will intersectWithComplement clear the pts first?
-                        typename PT::PtsTy diff;
                         auto node = consGraph.getNode(v);
                         bool newCons = consGraph.addConstraints((*it), node, Constraints::copy);
                         if (newCons) {
+                            // FIXME: will intersectWithComplement clear the pts first?
+                            typename PT::PtsTy diff;
                             diff.intersectWithComplement(PT::getPointsTo((*it)->getNodeID()), PT::getPointsTo(v));
                             deepPropagate(node, (*it), diff, changed);
                         }
@@ -125,13 +126,19 @@ protected:
                 }
 
                 // for all offset constraints
-                for (auto it = curNode->succ_offset_begin(), ie = curNode->succ_offset_end(); it != ie; it++) {
-                    // offset already cached the diff points to set
-                    changed |= super::processOffset(curNode, *it, [&](CGNodeTy *src, CGNodeTy *dst) {
-                      auto addrNode = llvm::cast<typename super::ObjNodeTy>(src)->getAddrTakenNode();
-                      super::processCopy(addrNode, dst);
-                    });
-                }
+                // for (auto it = curNode->succ_offset_begin(), ie = curNode->succ_offset_end(); it != ie; it++) {
+                //     // offset already cached the diff points to set
+                //     changed |= super::processOffset(curNode, *it, [&](CGNodeTy *src, CGNodeTy *dst) {
+                //       auto addrNode = llvm::cast<typename super::ObjNodeTy>(src)->getAddrTakenNode();
+                //       super::processCopy(addrNode, dst);
+                //     });
+                // }
+            }
+
+            if (changed) {
+                size_t afterResolve = this->getConsGraph()->getNodeNum();
+                LOG_INFO("PTA Node Stat: Before={}, After={}, New={}", beforeResolve, afterResolve,
+                         afterResolve - beforeResolve);
             }
         } while (changed);
     }
@@ -144,10 +151,21 @@ protected:
         }
 
         typename PT::PtsTy newPTS;
-        auto pts = PT::getPointsTo(start->getNodeID());
+        // NOTE: getPointsTo returns const!!!
+        typename PT::PtsTy& pts = const_cast<typename PT::PtsTy&>(PT::getPointsTo(start->getNodeID()));
+
         newPTS.intersectWithComplement(diff, pts);
         if (!newPTS.empty()) {
-            pts |= newPTS;
+            // FIXME: I should use processCopy?
+            // pts |= newPTS;
+            if (bool updated = (pts |= newPTS)) {
+                if (start->isFunctionPtr()) {
+                    // node used for indirect call
+                    super::updateFunPtr(start->getNodeID());
+                    LOG_INFO("function pointer updated");
+                }
+                pts = PT::getPointsTo(start->getNodeID());
+            }
             changed = true;
             // line 10 of algo 7
             for (auto cit = start->succ_copy_begin(), cie = start->succ_copy_end(); cit != cie; cit++) {
