@@ -11,6 +11,7 @@
 #include "aser/PointerAnalysis/Models/MemoryModel/FieldSensitive/FSMemModel.h"
 #include "aser/PointerAnalysis/PointerAnalysisPass.h"
 #include "aser/PointerAnalysis/Solver/PartialUpdateSolver.h"
+#include "aser/PointerAnalysis/Solver/DeepPropagation.h"
 #include "aser/PreProcessing/Passes/InsertGlobalCtorCallPass.h"
 
 using namespace llvm;
@@ -20,7 +21,8 @@ using namespace aser;
 #define CHECK_ALIAS_FUN "__aser_alias__"
 
 using Model = DefaultLangModel<NoCtx, FSMemModel<NoCtx>>;
-using Solver = PartialUpdateSolver<Model>;
+// using Solver = PartialUpdateSolver<Model>;
+using Solver = DeepPropagation<Model>;
 
 cl::opt<std::string> TestIR(cl::Positional, cl::desc("path to input bitcode file"));
 

@@ -6,15 +6,15 @@
 
 #include "aser/Util/Log.h"
 
-//using namespace aser;
+// using namespace aser;
 using namespace llvm;
 
 int main(int argc, char** argv) {
-    //logger::LoggingConfig config;
-    //config.enableFile = false;
-    //config.enableTerminal = true;
-    //config.level = spdlog::level::info;
-    //logger::init(config);
+    // logger::LoggingConfig config;
+    // config.enableFile = false;
+    // config.enableTerminal = true;
+    // config.level = spdlog::level::info;
+    // logger::init(config);
 
     ::testing::InitGoogleTest(&argc, argv);
 
