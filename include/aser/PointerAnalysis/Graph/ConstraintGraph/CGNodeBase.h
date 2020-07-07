@@ -46,6 +46,14 @@ enum class CGNodeKind : uint8_t {
     SuperNode = 2,
 };
 
+// NOTE: for deep propagation
+// in order to eliminate set operations
+enum class Color : uint8_t {
+    DEFAULT = 0,
+    GREY = 1,
+    BLACK = 2,
+};
+
 template <typename ctx>
 class CGNodeBase {
 protected:
@@ -56,6 +64,8 @@ protected:
     const CGNodeKind type;
     const NodeID id;
     const GraphTy *graph;
+
+    Color color;
 
     Self *superNode; // the super node
     llvm::SparseBitVector<> childNodes;
@@ -73,7 +83,7 @@ protected:
     IndirectNodeSet indirectNodes;
 
     inline CGNodeBase(NodeID id, CGNodeKind type)
-        : id(id), type(type), superNode(nullptr), childNodes{}, indirectNodes{} {}
+        : id(id), type(type), superNode(nullptr), childNodes{}, indirectNodes{}, color(Color::DEFAULT) {}
 
 private:
     inline bool insertConstraint(Self *node, Constraints edgeKind) {
@@ -159,6 +169,14 @@ public:
             node = node->superNode;
         }
         return node;
+    }
+
+    inline void setColor(Color c) {
+        this->color = c;
+    }
+
+    inline Color getColor() {
+        return this->color;
     }
 
     // remove all the edges
