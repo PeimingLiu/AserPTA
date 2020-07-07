@@ -11,9 +11,9 @@
 namespace aser {
 
 template <typename LangModel>
-class DeepPropagation : public SolverBase<LangModel, WavePropagation<LangModel>> {
+class DeepPropagation : public SolverBase<LangModel, DeepPropagation<LangModel>> {
 public:
-    using super = SolverBase<LangModel, WavePropagation<LangModel>>;
+    using super = SolverBase<LangModel, DeepPropagation<LangModel>>;
     using PtsTy = typename super::PtsTy;
     using PT = PTSTrait<PtsTy>;
     using ConsGraphTy = ConstraintGraph<typename super::ctx>;
@@ -74,6 +74,7 @@ protected:
         // Step 3: deep propagation
         do {
             changed = false;
+            LOG_INFO("Deep Propagation Solving");
             size_t nodeNum = consGraph.getNodeNum();
             for (NodeID id = 0; id < nodeNum; id++) {
                 CGNodeTy *curNode = consGraph.getNode(id);
@@ -89,8 +90,8 @@ protected:
                     newEdgePTS.intersectWithComplement(PT::getPointsTo(curNode->getNodeID()),
                                                     cachedPts);
                     cachedPts |= newEdgePTS;
-                    for (auto &v : newEdgePTS) {
-                        bool newCons = consGraph->addConstraints(consGraph->getNode(v), (*it), Constraints::copy);
+                    for (auto v : newEdgePTS) {
+                        bool newCons = consGraph.addConstraints(consGraph.getNode(v), (*it), Constraints::copy);
                         if (newCons)
                             newPTS |= PT::getPointsTo(v);
                     }
@@ -110,11 +111,11 @@ protected:
                                                     cachedPts);
                     cachedPts |= newEdgePTS;
 
-                    for (auto &v : newEdgePTS) {
+                    for (auto v : newEdgePTS) {
                         // FIXME: will intersectWithComplement clear the pts first?
                         typename PT::PtsTy diff;
-                        auto node = consGraph->getNode(v);
-                        bool newCons = consGraph->addConstraints((*it), node, Constraints::copy);
+                        auto node = consGraph.getNode(v);
+                        bool newCons = consGraph.addConstraints((*it), node, Constraints::copy);
                         if (newCons) {
                             diff.intersectWithComplement(PT::getPointsTo((*it)->getNodeID()), PT::getPointsTo(v));
                             deepPropagate(node, (*it), diff, changed);
@@ -143,19 +144,19 @@ protected:
         }
 
         typename PT::PtsTy newPTS;
-        auto pts = PT::getPointsTo(start);
+        auto pts = PT::getPointsTo(start->getNodeID());
         newPTS.intersectWithComplement(diff, pts);
-        if (!newPTS.isEmpty()) {
+        if (!newPTS.empty()) {
             pts |= newPTS;
             changed = true;
             // line 10 of algo 7
             for (auto cit = start->succ_copy_begin(), cie = start->succ_copy_end(); cit != cie; cit++) {
-                if (*cit == stop || deepPropagate(*cit, stop, newPTS, &changed)) {
+                if (*cit == stop || deepPropagate(*cit, stop, newPTS, changed)) {
                     start->setColor(Color::GREY);
                     return true;
                 } else {
                     start->setColor(Color::BLACK);
-                    blackNodes.insert(start);
+                    blackNodes.push_back(start);
                     return false;
                 }
             }
@@ -167,10 +168,10 @@ protected:
                     return true;
                 }
             }
-            start->setColor(Color::BLACK);
-            blackNodes.insert(start);
-            return false;
         }
+        start->setColor(Color::BLACK);
+        blackNodes.push_back(start);
+        return false;
     }
 
     void unmarkBlack() {

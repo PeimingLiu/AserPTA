@@ -141,11 +141,11 @@ int main(int argc, char** argv) {
     passes.add(new RemoveASMInstPass());
     passes.add(new StandardHeapAPIRewritePass);
 
-    passes.add(new PointerAnalysisPass<NoCtxSolver>());
-    passes.add(new PTADriverPass<NoCtxSolver>);
+    // passes.add(new PointerAnalysisPass<NoCtxSolver>());
+    // passes.add(new PTADriverPass<NoCtxSolver>);
 
-    passes.add(new PointerAnalysisPass<WaveSolver>());
-    passes.add(new PTADriverPass<WaveSolver>);
+    // passes.add(new PointerAnalysisPass<WaveSolver>());
+    // passes.add(new PTADriverPass<WaveSolver>);
 
     passes.add(new PointerAnalysisPass<DPSolver>());
     passes.add(new PTADriverPass<DPSolver>);
