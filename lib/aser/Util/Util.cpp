@@ -53,7 +53,7 @@ bool aser::isCompatibleCall(const llvm::Instruction *indirectCall, const llvm::F
     auto fit = CS.arg_begin();
     for (const Argument &arg : target->args()) {
         const Value *param = *fit;
-        if (param->getType() != arg.getType()) {
+        if (param->getType()->isPointerTy() != arg.getType()->isPointerTy()) {
             return false;
         }
         fit++;

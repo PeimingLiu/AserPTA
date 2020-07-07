@@ -52,26 +52,27 @@ public:
 
     // **** optional ****
     inline void interceptEntryFun(const llvm::Function *entry) {
+        return;
         // empty, by default do not intercept Entry function for now
-        auto it = entry->arg_begin();
-        auto ie = entry->arg_end();
-
-        for (; it != ie; it++) {
-            if (it->getType()->isPointerTy()) {
-                auto objNode = MMT::template allocateAnonObj<PT>(this->getMemModel(),                     // memory model
-                                                                 CT::getInitialCtx(),                     // initial context
-                                                                 this->getLLVMModule()->getDataLayout(),  // data layout
-                                                                 // model pointer as array, it is more conservative
-                                                                 // as it allows indexing on the object
-                                                                 // int * --> int []
-                                                                 getUnboundedArrayTy(it->getType()->getPointerElementType()),
-                                                                 &(*it),   // use the argument as tag
-                                                                 true); // do it recursively
-
-                auto ptrNode = this->getPtrNode(CT::getInitialCtx(), &(*it));
-                this->consGraph->addConstraints(objNode, ptrNode, Constraints::addr_of);
-            }
-        }
+//        auto it = entry->arg_begin();
+//        auto ie = entry->arg_end();
+//
+//        for (; it != ie; it++) {
+//            if (it->getType()->isPointerTy()) {
+//                auto objNode = MMT::template allocateAnonObj<PT>(this->getMemModel(),                     // memory model
+//                                                                 CT::getInitialCtx(),                     // initial context
+//                                                                 this->getLLVMModule()->getDataLayout(),  // data layout
+//                                                                 // model pointer as array, it is more conservative
+//                                                                 // as it allows indexing on the object
+//                                                                 // int * --> int []
+//                                                                 getUnboundedArrayTy(it->getType()->getPointerElementType()),
+//                                                                 &(*it),   // use the argument as tag
+//                                                                 true); // do it recursively
+//
+//                auto ptrNode = this->getPtrNode(CT::getInitialCtx(), &(*it));
+//                this->consGraph->addConstraints(objNode, ptrNode, Constraints::addr_of);
+//            }
+//        }
     }
 
 protected:
