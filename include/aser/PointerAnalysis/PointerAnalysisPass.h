@@ -28,15 +28,15 @@ public:
         // release previous context
         solver.reset(new Solver());
 
-        LOG_INFO("PTA start to run");
+        llvm::outs() << "PTA start to run\n";
         auto start = std::chrono::steady_clock::now();
         solver->analyze(M, entry);
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
 
-        LOG_INFO("PTA finished, running time : {} ms",
-                 std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_seconds).count());
+        llvm::outs() << "PTA finished, running time : "
+                     << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_seconds).count() << " ms\n";
     }
 
     Solver *getPTA() const {
