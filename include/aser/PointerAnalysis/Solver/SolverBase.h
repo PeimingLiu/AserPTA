@@ -4,6 +4,8 @@
 #define ASER_PTA_SOLVERBASE_H
 
 #define DEBUG_TYPE "pta"
+#define NO_STATS
+
 #include <llvm/IR/Module.h>
 #include <llvm/Pass.h>
 
@@ -11,8 +13,16 @@
 #include "aser/PointerAnalysis/Models/MemoryModel/MemModelTrait.h"
 #include "aser/PointerAnalysis/Solver/PointsTo/BitVectorPTS.h"
 #include "aser/PointerAnalysis/Graph/CallGraph.h"
-#include "aser/Util/Statistics.h"
 #include "aser/Util/Log.h"
+#include <llvm/ADT/Statistic.h>
+
+#ifndef NO_STATS
+#define LOCAL_STATISTIC(VARNAME, DESC) \
+  llvm::Statistic VARNAME {DEBUG_TYPE, #VARNAME, DESC, {0}, {false}}
+#else
+#define LOCAL_STATISTIC(VARNAME, DESC) \
+  int VARNAME = 0;
+#endif
 
 extern llvm::cl::opt<bool> ConfigPrintConstraintGraph;
 extern llvm::cl::opt<bool> ConfigPrintCallGraph;
@@ -497,5 +507,5 @@ bool SolverBase<LangModel, SubClass>::processCopy(CGNodeTy *src, CGNodeTy *dst) 
 }  // namespace aser
 
 #undef DEBUG_TYPE
-
+#undef NO_STATS
 #endif

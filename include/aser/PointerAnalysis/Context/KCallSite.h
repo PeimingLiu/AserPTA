@@ -101,6 +101,7 @@ public:
     }
 
     static void release() {
+        llvm::outs() << "!!!!!!! Finished Running 2-CallSite Sensitive Pointer Analysis (2-CFA)" << "\n";
         ctxSet.clear();
     }
 };

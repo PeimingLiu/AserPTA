@@ -25,7 +25,9 @@ struct CtxTrait<NoCtx> {
     constexpr static const NoCtx* getGlobalCtx() { return nullptr; }
 
     inline static std::string toString(const NoCtx*, bool detailed = false) { return "<Empty>"; }
-    inline static void release() {};
+    inline static void release() {
+      llvm::outs() << "!!!!!!! Finished Running Context Insensitive Pointer Analysis" << "\n\n";
+    };
 };
 
 }  // namespace aser

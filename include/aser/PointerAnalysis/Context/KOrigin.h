@@ -78,7 +78,8 @@ public:
     }
 
     static void release() {
-        llvm::outs() << "number of origin " << ctxSet.size() << "\n";
+        //llvm::outs() << "number of origin " << ctxSet.size() + 1 << "\n";
+      llvm::outs() << "!!!!!!! Finished Running Origin Sensitive Pointer Analysis (O2)" << "\n\n";
         ctxSet.clear();
     }
 };

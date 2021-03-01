@@ -112,8 +112,8 @@ public:
 
     template <typename PT>
     inline void processAggregateGlobals(const llvm::GlobalVariable *gVar, const llvm::Constant *c) {
-        assert(llvm::isa<llvm::ConstantArray>(c) || llvm::isa<llvm::ConstantDataSequential>(c) ||
-               llvm::isa<llvm::ConstantStruct>(c));
+//        assert(llvm::isa<llvm::ConstantArray>(c) || llvm::isa<llvm::ConstantStruct>(c) ||
+//             llvm::isa<llvm::ConstantDataArray>(c));
         // field-insensitive
         for (unsigned i = 0, e = c->getNumOperands(); i != e; ++i) {
             // every field in the object are copied to the starting address of

@@ -376,8 +376,8 @@ private:
     template <typename PT>
     inline void processAggregateGlobals(MemBlock<ctx> *memBlock, const llvm::Constant *C, size_t &offset,
                                         const llvm::DataLayout &DL) {
-        assert(llvm::isa<llvm::ConstantArray>(C) || llvm::isa<llvm::ConstantStruct>(C) ||
-               llvm::isa<llvm::ConstantDataArray>(C));
+      assert(llvm::isa<llvm::ConstantArray>(C) || llvm::isa<llvm::ConstantStruct>(C) ||
+             llvm::isa<llvm::ConstantDataArray>(C));
 
         size_t initOffset = offset;
         if (llvm::isa<llvm::ConstantArray>(C) || llvm::isa<llvm::ConstantStruct>(C)) {

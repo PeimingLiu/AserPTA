@@ -10,7 +10,7 @@ using namespace aser;
 using namespace llvm;
 
 cl::opt<size_t> MaxIndirectTarget("max-indirect-target",
-                                  cl::init(std::numeric_limits<size_t>::max()),  // by default no limitation
+                                  cl::init(2),  // by default no limitation
                                   cl::desc("max number of indirect call target that can be resolved by indirect call"));
 
 const Function* aser::CallSite::resolveTargetFunction(const Value* calledValue) {
