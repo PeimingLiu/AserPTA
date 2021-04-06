@@ -126,21 +126,16 @@ protected:
                 }
 
                 // for all offset constraints
-                // for (auto it = curNode->succ_offset_begin(), ie = curNode->succ_offset_end(); it != ie; it++) {
-                //     // offset already cached the diff points to set
-                //     changed |= super::processOffset(curNode, *it, [&](CGNodeTy *src, CGNodeTy *dst) {
-                //       auto addrNode = llvm::cast<typename super::ObjNodeTy>(src)->getAddrTakenNode();
-                //       super::processCopy(addrNode, dst);
-                //     });
-                // }
-            }
-
-            if (changed) {
-                size_t afterResolve = this->getConsGraph()->getNodeNum();
-                LOG_INFO("PTA Node Stat: Before={}, After={}, New={}", beforeResolve, afterResolve,
-                         afterResolve - beforeResolve);
+                 for (auto it = curNode->succ_offset_begin(), ie = curNode->succ_offset_end(); it != ie; it++) {
+                     // offset already cached the diff points to set
+                     changed |= super::processOffset(curNode, *it, [&](CGNodeTy *src, CGNodeTy *dst) {
+                       auto addrNode = llvm::cast<typename super::ObjNodeTy>(src)->getAddrTakenNode();
+                       super::processCopy(addrNode, dst);
+                     });
+                 }
             }
         } while (changed);
+
     }
 
     bool deepPropagate(CGNodeTy *start, CGNodeTy *stop, typename PT::PtsTy diff, bool &changed) {
@@ -162,7 +157,7 @@ protected:
                 if (start->isFunctionPtr()) {
                     // node used for indirect call
                     super::updateFunPtr(start->getNodeID());
-                    LOG_INFO("function pointer updated");
+                    //LOG_INFO("function pointer updated");
                 }
                 pts = PT::getPointsTo(start->getNodeID());
             }
