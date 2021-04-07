@@ -150,8 +150,6 @@ protected:
         }
 
         // update the cached pts
-
-
         for (auto objNode : nodeVec) {
             // this might create new object, thus modify the points-to set
             CGNodeTy *fieldObj = LMT::indexObject(this->getLangModel(), objNode, gep);

@@ -33,8 +33,12 @@ public:
 
     LOCAL_STATISTIC(NumObjNode, "Number of Object Nodes");
     LOCAL_STATISTIC(NumPtrNode, "Number of Pointer Nodes");
-    LOCAL_STATISTIC(NumConstraints, "Number of Constrains");
-    LOCAL_STATISTIC(NumNodes, "Number of Nodes in Total");
+  LOCAL_STATISTIC(NumConstraints, "Number of Constrains");
+  LOCAL_STATISTIC(NumLoadConstraints, "Number of Load Constrains");
+  LOCAL_STATISTIC(NumStoreConstraints, "Number of Store Constrains");
+  LOCAL_STATISTIC(NumCopyConstraints, "Number of Assign Constrains");
+  LOCAL_STATISTIC(NumOffsetConstraints, "Number of Offset Constrains");
+  LOCAL_STATISTIC(NumNodes, "Number of Nodes in Total");
 
 private:
     OnNewConstraintCallBack *callBack;
@@ -79,17 +83,36 @@ public:
                 if (callBack) {
                     callBack->onNewConstraint(anonNode, dst, Constraints::copy);
                 }
-
-                NumConstraints++;
                 return true;
             }
             return false;
         } else {
             bool newEdge = src->insertConstraint(dst, constraint);
             if (callBack && newEdge) {
-                NumConstraints++;
-                callBack->onNewConstraint(src, dst, constraint);
+              callBack->onNewConstraint(src, dst, constraint);
             }
+          if (newEdge) {
+            switch (constraint) {
+            case Constraints::load:
+              NumLoadConstraints++;
+              NumConstraints++;
+              break;
+            case Constraints::store:
+              NumStoreConstraints++;
+              NumConstraints++;
+              break;
+            case Constraints::copy:
+              NumCopyConstraints++;
+              NumConstraints++;
+              break;
+            case Constraints::offset:
+              NumOffsetConstraints++;
+              NumConstraints++;
+              break;
+            case Constraints::addr_of:
+              break;
+            }
+          }
             return newEdge;
         }
     }
