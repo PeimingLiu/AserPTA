@@ -33,7 +33,7 @@ static cl::opt<std::string> TargetModulePath(cl::Positional, cl::desc("path to i
 using Origin = KOrigin<1>;
 
 template <typename ctx>
-using Model = DefaultLangModel<ctx, FIMemModel<ctx>>;
+using Model = DefaultLangModel<ctx, FSMemModel<ctx>>;
 
 //using OriginSolver = PartialUpdateSolver<Model<Origin>>;
 using WaveSolver = WavePropagation<Model<NoCtx>>;

@@ -18,7 +18,7 @@ endif()
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSPDLOG_ACTIVE_LEVEL=2 -DRACE_DETECT_DEBUG")  # log level = debug
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSPDLOG_ACTIVE_LEVEL=6")  # log level = warn
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSPDLOG_ACTIVE_LEVEL=2")  # log level = warn
 endif()
 
 set(COMMON_CXX_FLAG "-fno-rtti -Wno-c++14-extensions -Wno-c++17-extensions")

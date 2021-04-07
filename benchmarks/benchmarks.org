@@ -1,0 +1,35 @@
+|-------------+------------------------------------------------|
+| Benchmark   | Details                                        |
+|-------------+------------------------------------------------|
+| curl        | https://github.com/curl/curl.git               |
+|             | 424092e70f4c83e32d16bdbb1316526c10e57139       |
+|-------------+------------------------------------------------|
+| flatbuffers | https://github.com/google/flatbuffers.git      |
+|             | cd67261bbab01b60c2407dcbf4736037aae5d8e4       |
+|-------------+------------------------------------------------|
+| memcached   | https://github.com/memcached/memcached.git     |
+|             | b031143f8ab61296ddbf6c4470c5dcdbf7ae588b       |
+|-------------+------------------------------------------------|
+| nfs-ganesha | https://github.com/nfs-ganesha/nfs-ganesha.git |
+|             | 21f0535bfd2e55c341e5dfa3497f14f58fa1359d       |
+|-------------+------------------------------------------------|
+| postgres    | https://github.com/postgres/postgres.git       |
+|             | 29be9983a64c011eac0b9ee29895cce71e15ea77       |
+|-------------+------------------------------------------------|
+| cpython     | https://github.com/python/cpython.git          |
+|             | fb78692f2ad5ee4747f13a73943fbf134b637669       |
+|-------------+------------------------------------------------|
+| redis       | https://github.com/redis/redis.git             |
+|             | 26301897d0f298446f6cc9c21e72484c4488ebe5       |
+|-------------+------------------------------------------------|
+| sqlite      | https://github.com/sqlite/sqlite.git           |
+|             | 531d01cae013213d1cf4ba2a41ed3cfa870d295e       |
+|-------------+------------------------------------------------|
+| vim         | https://github.com/vim/vim.git                 |
+|             | e8c4660a55364a5d3e395652d1202b8702666823       |
+|-------------+------------------------------------------------|
+| z3          | https://github.com/Z3Prover/z3.git             |
+|             | c13e3ce693e9a57a16d747b1fec40fd46d20b8d9       |
+|-------------+------------------------------------------------|
+
+

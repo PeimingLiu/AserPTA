@@ -1,0 +1,163 @@
+running on curl.bc
+[2021-04-07 11:04:13.896] [info] [wpa.cpp:123] Preprocessing IR
+[2021-04-07 11:04:13.909] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:04:16.241] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=64012, After=88848, New=24836
+[2021-04-07 11:04:27.982] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=90884, After=97294, New=6410
+[2021-04-07 11:04:35.913] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=97594, After=97923, New=329
+[2021-04-07 11:04:37.660] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 23751 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+[2021-04-07 11:04:37.795] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:04:40.420] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=64012, After=88848, New=24836
+[2021-04-07 11:04:47.501] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=90884, After=97294, New=6410
+[2021-04-07 11:04:59.231] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=97594, After=97923, New=329
+[2021-04-07 11:05:10.401] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 32605 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+[2021-04-07 11:05:10.635] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:05:10.747] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=62022, After=69328, New=7306
+[2021-04-07 11:05:10.851] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=70516, After=70908, New=392
+[2021-04-07 11:05:11.032] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=71964, After=78059, New=6095
+[2021-04-07 11:05:11.575] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=79541, After=91021, New=11480
+[2021-04-07 11:05:12.739] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=91481, After=91767, New=286
+[2021-04-07 11:05:15.071] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=91863, After=94428, New=2565
+[2021-04-07 11:05:18.448] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=94450, After=97566, New=3116
+[2021-04-07 11:05:23.073] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=97594, After=97616, New=22
+[2021-04-07 11:05:28.458] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=97626, After=97939, New=313
+[2021-04-07 11:05:34.931] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 24296 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+\n\n\n
+running on flatc.bc
+[2021-04-07 11:05:36.015] [info] [wpa.cpp:123] Preprocessing IR
+[2021-04-07 11:05:36.081] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:05:36.230] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=49706, After=130855, New=81149
+[2021-04-07 11:05:39.156] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=140649, After=256866, New=116217
+[2021-04-07 11:06:15.790] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=318650, After=331138, New=12488
+[2021-04-07 11:06:49.785] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=337848, After=349306, New=11458
+[2021-04-07 11:07:10.783] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=350496, After=350496, New=0
+[2021-04-07 11:07:10.783] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 94702 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+[2021-04-07 11:07:11.148] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:07:11.346] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=49706, After=130847, New=81141
+[2021-04-07 11:07:22.958] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=140649, After=256862, New=116213
+[2021-04-07 11:08:33.555] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=318650, After=331138, New=12488
+[2021-04-07 11:09:17.907] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=337848, After=349306, New=11458
+[2021-04-07 11:10:01.403] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=350496, After=350496, New=0
+[2021-04-07 11:10:28.797] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 197649 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+[2021-04-07 11:10:29.674] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:10:29.895] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=49706, After=130847, New=81141
+[2021-04-07 11:10:30.281] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=134583, After=250782, New=116199
+[2021-04-07 11:10:30.933] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=293224, After=304999, New=11775
+[2021-04-07 11:10:31.811] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=310875, After=314351, New=3476
+[2021-04-07 11:10:36.525] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=338291, After=339279, New=988
+[2021-04-07 11:10:55.288] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=341059, After=341295, New=236
+[2021-04-07 11:12:06.963] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=342449, After=349934, New=7485
+[2021-04-07 11:13:02.521] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=350470, After=350470, New=0
+[2021-04-07 11:13:48.033] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 198358 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+\n\n\n
+running on ganesha.nfsd.bc
+[2021-04-07 11:13:51.030] [info] [wpa.cpp:123] Preprocessing IR
+[2021-04-07 11:13:51.093] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:13:52.073] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=108807, After=131419, New=22612
+[2021-04-07 11:13:54.849] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=132601, After=161802, New=29201
+[2021-04-07 11:14:04.346] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=163020, After=167647, New=4627
+[2021-04-07 11:14:18.917] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=168751, After=169229, New=478
+[2021-04-07 11:14:20.237] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=169411, After=170256, New=845
+[2021-04-07 11:14:23.572] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=170290, After=170290, New=0
+[2021-04-07 11:14:23.812] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 32718 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+[2021-04-07 11:14:24.067] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:14:52.074] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=108807, After=131365, New=22558
+[2021-04-07 11:14:56.839] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=132601, After=161784, New=29183
+[2021-04-07 11:15:26.939] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=163020, After=167633, New=4613
+[2021-04-07 11:15:44.716] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=168751, After=169229, New=478
+[2021-04-07 11:16:01.961] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=169411, After=170256, New=845
+[2021-04-07 11:16:22.460] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=170290, After=170290, New=0
+[2021-04-07 11:16:38.257] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 134190 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+[2021-04-07 11:16:38.741] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:16:38.968] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=103257, After=108963, New=5706
+[2021-04-07 11:16:39.159] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=110271, After=118071, New=7800
+[2021-04-07 11:16:39.449] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=118703, After=138023, New=19320
+[2021-04-07 11:16:39.991] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=139147, After=148432, New=9285
+[2021-04-07 11:16:41.068] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=149140, After=156138, New=6998
+[2021-04-07 11:16:43.185] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=156612, After=161379, New=4767
+[2021-04-07 11:16:45.601] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=162085, After=163041, New=956
+[2021-04-07 11:16:49.918] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=163417, After=163867, New=450
+[2021-04-07 11:16:56.025] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=164351, After=164527, New=176
+[2021-04-07 11:17:04.322] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=164853, After=165624, New=771
+[2021-04-07 11:17:19.098] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=165828, After=165828, New=0
+[2021-04-07 11:17:36.630] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=165998, After=165998, New=0
+[2021-04-07 11:17:53.371] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 74630 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+\n\n\n
+running on memcached.bc
+[2021-04-07 11:17:54.216] [info] [wpa.cpp:123] Preprocessing IR
+[2021-04-07 11:17:54.221] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:17:54.270] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=16818, After=18869, New=2051
+[2021-04-07 11:17:54.276] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 54 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+[2021-04-07 11:17:54.288] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:17:54.413] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=16818, After=18869, New=2051
+[2021-04-07 11:17:54.715] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 427 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+[2021-04-07 11:17:54.731] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:17:54.758] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=16462, After=17054, New=592
+[2021-04-07 11:17:54.787] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=17302, After=18675, New=1373
+[2021-04-07 11:17:54.828] [info] [PointerAnalysisPass.h:39] PTA finished, running time : 97 ms
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+
+\n\n\n
+running on postgres.bc
+[2021-04-07 11:17:59.522] [info] [wpa.cpp:123] Preprocessing IR
+[2021-04-07 11:17:59.768] [info] [PointerAnalysisPass.h:31] PTA start to run
+[2021-04-07 11:18:03.288] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=430541, After=757223, New=326682
+[2021-04-07 11:34:42.277] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=771287, After=818435, New=47148
+[2021-04-07 11:56:45.234] [info] [ConsGraphBuilder.h:310] PTA Node Stat: Before=819777, After=845067, New=25290
