@@ -109,7 +109,7 @@ public:
               NumOffsetConstraints++;
               NumConstraints++;
               break;
-            case Constraints::addr_of:
+            default:
               break;
             }
           }

@@ -159,7 +159,15 @@ protected:
 
             if (!PT::has(ptrNode->getNodeID(), fieldObj->getNodeID())) {
                 // insert an addr_of constraint if ptrNode does not points to field object previous
+//#ifndef NO_ADDR_OF_FOR_OFFSET
+              // insert an addr_of constraint if ptrNode does not points to field object previous
+                // this is the major source for newly inserted constraints
+                // remove this but relying on solver to handle it correctly
+                // can improve both performance and memory effciency
+                // but the visualization of the constraint graph will be affected.
                 this->consGraph->addConstraints(fieldObj, ptrNode, Constraints::addr_of);
+//#endif
+                //this->consGraph->addConstraints(fieldObj, ptrNode, Constraints::addr_of);
                 callBack(fieldObj, ptrNode);
                 changed = true;
             }

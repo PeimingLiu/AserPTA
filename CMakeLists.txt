@@ -21,7 +21,7 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSPDLOG_ACTIVE_LEVEL=2")  # log level = warn
 endif()
 
-set(COMMON_CXX_FLAG "-fno-rtti -Wno-c++14-extensions -Wno-c++17-extensions")
+set(COMMON_CXX_FLAG "-fno-rtti -Wno-c++14-extensions -Wno-c++17-extensions -DNO_ADDR_OF_FOR_OFFSET")
 
 # To support both in- and out-of-source builds,
 # we check for the presence of the add_llvm_loadable_module command.

@@ -225,9 +225,6 @@ protected:
                 copySCCStack.pop();
             }
 
-            if (CollectStats) {
-                LOG_INFO("Partial Update Solver: N:{}, E:{}, TN:{}", processedNode, processedEdge, consGraph.getNodeNum());
-            }
             assert(copySCCStack.size() == 0);
 
             // set all copy to be already handled
@@ -242,11 +239,13 @@ protected:
                 CGNodeTy *curNode = consGraph.getNode(lastID);
 
                 for (auto it = curNode->pred_store_begin(), ie = curNode->pred_store_end(); it != ie; it++) {
+                  processedEdge++;
                     super::processStore(*it, curNode,
                                         [&](CGNodeTy *src, CGNodeTy *dst) { recordCopyEdge(src, dst); });
                 }
 
                 for (auto it = curNode->succ_load_begin(), ie = curNode->succ_load_end(); it != ie; it++) {
+                  processedEdge++;
                     super::processLoad(curNode, *it,
                                        [&](CGNodeTy *src, CGNodeTy *dst) { recordCopyEdge(src, dst); });
                 }
@@ -276,11 +275,11 @@ protected:
                 CGNodeTy *curNode = consGraph.getNode(lastID);
 
                 for (auto it = curNode->succ_offset_begin(), ie = curNode->succ_offset_end(); it != ie; it++) {
+                  processedEdge++;
                     super::processOffset(curNode, *it, [&](CGNodeTy *fieldObj, CGNodeTy *ptr) {
                       assert(ptr->getNodeID() < targetList.size());
                       //targetList.reset(ptr->getNodeID());
-                      PT::insert(ptr->getNodeID(), llvm::cast<ObjNodeTy>(fieldObj)->getObjectID());
-
+                      PT::insert(ptr->getNodeID(), fieldObj->getNodeID());
                       // ensure that ptr is visited by SCCIterator
                       copyWorkList.reset(ptr->getNodeID());
                       // the pts of ptr has been updated, so need to be revisted by load/store
@@ -290,6 +289,10 @@ protected:
                 lastID = tmpWorklist.find_next_unset(lastID);
             }
 #endif
+          if (CollectStats) {
+            LOG_INFO("Partial Update Solver: N:{}, E:{}, TN:{}", processedNode, processedEdge, consGraph.getNodeNum());
+          }
+
             lsWorkList.resize(consGraph.getNodeNum(), true);
             // the newly added node contains address taken node, which need to be revisited again
             // so set the extend bit to 0 (unhandled)
