@@ -36,9 +36,13 @@ template <typename ctx>
 using Model = DefaultLangModel<ctx, FSMemModel<ctx>>;
 
 //using OriginSolver = PartialUpdateSolver<Model<Origin>>;
-using WaveSolver = WavePropagation<Model<NoCtx>>;
-using DPSolver = DeepPropagation<Model<NoCtx>>;
-using NoCtxSolver = PartialUpdateSolver<Model<NoCtx>>;
+// using WaveSolver = WavePropagation<Model<NoCtx>>;
+// using DPSolver = DeepPropagation<Model<NoCtx>>;
+// using NoCtxSolver = PartialUpdateSolver<Model<NoCtx>>;
+
+using WaveSolver = WavePropagation<Model<KCallSite<1>>>;
+using DPSolver = DeepPropagation<Model<KCallSite<1>>>;
+using NoCtxSolver = PartialUpdateSolver<Model<KCallSite<1>>>;
 //using CallsiteSolver = PartialUpdateSolver<Model<KCallSite<2>>>;
 
 namespace {
