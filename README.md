@@ -1,17 +1,5 @@
 # Building
 
-## (Option 1) VSCode Extension
-
-Install the `Remote - Containers` extenstion by Microsoft.
-Open the project in VSCode.
-Click the Dialog that says "Open in container".
-Wait for VSCode to open in the container. This may take a few minutes the first time.
-
-### VSCode Build Task
-Once VSCode has started in the container, the project can be built using the predefined build task.
-
-The build task can be run by pressing `Shift+Cmd+B` on a mac, or by pressing `Shift+Cmd+P` to open the commadn pallete and selecting "Tasks: Run Build Task".
-
 ### Manual Build
 The project can also be built manually by running the following from the ASER-PTA directory.
 
@@ -23,7 +11,7 @@ cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang ..
 In both cases executables will be placed in `ASER-PTA/build/bin`.
 
 
-## (Option 2) Local Installation
+## Local Installation
 
 Build LLVM-9.0.0 locally. Then run the following from the ASER-PTA root directory
 
@@ -63,18 +51,3 @@ RUN cmake \
     ../llvm
 make -j $(nproc)
 ```
-
-# Running
-
-To run the tool, simply type 
-```console
-./bin/racebench /your/path/to/the/IR/main.ll
-```
-
-> To get the IR file of the racebench
-```console
-cd /your/path/to/ASER-PTA/racebench
-make
-```
-the main.ll file is the whole program llvm IR file
-
